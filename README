@@ -1,0 +1,26 @@
+  ____        ____        _                    
+ |  _ \ ___  / ___|      / \   _ __  _ __  ___ 
+ | |_) / _ \| |   _____ / _ \ | '_ \| '_ \/ __|
+ |  __/ (_) | |__|_____/ ___ \| |_) | |_) \__ \
+ |_|   \___/ \____|   /_/   \_\ .__/| .__/|___/
+                              |_|   |_|
+
+Directory:
+|
+|- maze
+|	a virtual maze with dtmf navigation and web visualization
+|	languages: en, de
+|
+|- menschenrechte
+|	human rights - articles 1-30 - spoken in german
+|
+|- time
+|	a simple time announcement
+|
+
+Contact:
+|
+| Ben Fuhrmannek <bef@eventphone.de>
+|-	SIP/7310@fuhrmannek.de
+|-	IAX2/fuhrmannek.de/7310
+|

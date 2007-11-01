@@ -1,0 +1,73 @@
+maze init:
+	sounds(intro)
+		- welcome to the maze
+		- you are about to begin you journey through a maze.
+
+		- to skip the following help, press star.
+		- may the fnord be with you
+	sounds(help)
+		- for turning left and right, press 4 and 6, 
+		to move one step forward, press five, 
+		the stairs can be used with two and eight for up and down (obviously), 
+		the current level code can be acquired by pressing nine, 
+		you may enter a previously gathered level code after pressing zero, 
+		and for the lost -- a compass is available by pressing the star key
+		to repeat this help, press 1
+	sounds(level_intro)
+		- you are now commencing level XXX
+
+stairs error:
+	sounds(stair_error_UP/stair_error_DOWN)
+		- the stairs don't go up/down here
+		- try something else
+
+wall error:
+	sounds(wall_error)
+		- ran into the wall
+		- ouch
+		- it is not possible to move any further at this point
+		- may i suggest a change of direction here
+		- there is NO way ahead.
+		- i cannot pass through solid matter
+		- suicide is an option, but i'd rather turn arround
+		- move on, but NOT HERE
+
+level change:
+	sounds(enter_level_nr)
+		- enter the two digit level number
+	sounds(enter_level_code)
+		- enter your four digit level code
+	sounds(level_code_incorrect)
+		- incorrect code
+		- your lucky guess was INCORRECT
+		- this level was obviously not meant for you
+		- you entered the wrong code
+
+level code announce:
+	sounds(level_code)
+		- your level code for level XXX is YYYY
+
+exit through entrance:
+	sounds(exit_entrance)
+		- well done. you found the entrance
+		- this, my dear friend, was the entrance
+
+compass:
+	sounds(compass_NORTH/...)
+		- you are headed north/east/south/west
+		- your compass shows n/e/s/w
+		- n/e/s/w
+
+end of level:
+	sounds(level_succeeded)
+		- well done
+		- congratulations
+
+impression:
+	sounds(imp_wall)
+		- you are facing a wall
+	sounds(imp_free)
+		- move on
+	sounds(imp_intersect)
+		- move on or turn
+

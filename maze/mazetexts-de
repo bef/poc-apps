@@ -1,0 +1,99 @@
+maze init:
+	sounds(intro)
+		- willkommen im labyrinth
+		- hallo erstmal. ich weis nicht, ob du's schon wusstest, aber hier ist ein labyrinth im telefon.
+		
+		- wenn du das spiel schon kennst, dann kannst du mit der STERN taste weite erklearungen ueberspringen
+		- wenn ich dir zu viel herumlabere, dann drueck einfach die * taste.
+	sounds(help)
+		
+		- die steuerung ist ganz einfach: 5 zum vorwaertsgehen,
+		4 und 6 zum drehen nach links und rechts,
+		2 und 8 fuer treppe rauf und runter,
+		9 zum anhoeren des aktuellen levelcodes,
+		0 zum verwenden eines levelcodes
+		und die taste STERN dient als kompass
+		wenn dir das zu schnell ging, dann kannst du im spiel die erklaerung durch druecken der taste 1 wiederholen
+		- um in dem labyrinth herumzulaufen, brauchst du zunaechst erstmal nur die tasten 4, 5 und 6. mit 5 kannst du vorwaerts gehen, 4 und 6 drehen dich nach links und rechts.
+		treppen kannst du mit 2 und 8  rauf und runtergehen,
+		und die *-taste zeigt dir die himmelsrichtung, sozusagen als kleine hilfestellung.
+		wenn du spaeter nochmal anrufst und nicht wieder von vorne beginnen moechtest, dann brauchst du einen levelcode, der dir nach druecken der taste 9 mitgeteilt wird. diesen levelcode kannst du dann mit der taste 0 verwenden.
+		mit der taste 1 wird diese hilfe wiederholt.
+		- viel spass
+	sounds(level_intro)
+		- level
+		- es beginnt nun level
+
+stairs error:
+	sounds(stair_error_UP/stair_error_DOWN)
+		- hier ist keine treppe nach oben/unten
+		- nein, ich komme hier nicht hoch/runter
+
+wall error:
+	sounds(wall_error)
+		- hier gehts nicht weiter
+		- auu
+		- duerfte ich eine richtungsaenderung vorschlagen
+		- es gibt auch noch andere tasten am telefon
+		- dreh dich doch mal um
+		- hier kommst du wohl nicht weiter
+		- kann ich etwa durch waende gehen?
+		- nein. hier ist eine mauer.
+		- ein schoener versuch, aber kein durchgang
+		- kein durchgang
+		- ich komm hier nich durch die wand
+		- eine solide mauer
+
+level change:
+	sounds(enter_level_nr)
+		- bitte gib jetzt das guwuenschte level in zwei ziffern ein
+		- ich benoetige nun zwei ziffern fuer das gewuenschte level
+	sounds(enter_level_code)
+		- bitte gib deinen levelcode ein
+		- wie lautet der geheime levelcode?
+	sounds(level_code_incorrect)
+		- FAAALSCH!!
+		- der eingegebene code ist nicht korrekt
+		- tja. das war wohl verwaehlt
+
+level code announce:
+	sounds(level_code)
+		- der levelcode fuer level | ist
+		- level | hat den code
+		- du bist in level | der code lautet
+
+exit through entrance:
+	sounds(exit_entrance)
+		- herzlichen glueckwunsch. du hast den eingang gefunden.
+		- jetzt ist er auch noch durch den _eingang_ geflohen
+		- das war wohl der eingang
+
+compass:
+	sounds(compass_NORTH/...)
+		- du blickst nach norden/sueden/osten westen
+		- dein kompass zeigt nach n/s/o/w
+		- n/s/o/w
+		- richtung norwegen, polen, frankreich, italien
+
+end of level:
+	sounds(level_succeeded)
+		- puh. geschafft.
+		- ja.
+		- na endlich.
+		- ein kinderspiel
+		- das war doch kein aufwand
+		- toe toeoe, toe toeoe, toe toeoe
+
+impression:
+	sounds(imp_wall)
+		- du stehst vor einer wand
+		- [schnell] vor dir befindet sich eine wand
+	sounds(imp_free)
+		- der weg ist frei
+		- du kannst geradeaus gehen
+		- ja, geh doch weiter
+		- vor dir ist frei
+	sounds(imp_intersect)
+		- hier ist eine moegliche abzweigung
+		- du koenntest hier abbiegen
+

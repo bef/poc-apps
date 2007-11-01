@@ -1,0 +1,34 @@
+--- requirements ---
+- asterisk >= 1.2
+- tcl8.4
+- tcl agi 1.0 - http://tel.sf.net
+- mysql 5 (for the highscore only)
+- gdtclft (for graphical maze preview)
+
+--- apache config ---
+
+AddHandler cgi-script .cgi
+<Directory /home/bef/public_html>
+        AllowOverride All
+        Options FollowSymLinks ExecCGI
+</Directory>
+
+--- mysql config ---
+see maze.sql
+
+--- asterisk config ---
+exten => 8009,1,agi(mazegame.tcl,de)
+exten => 8010,1,agi(mazegame.tcl,en)
+
+--- maze game config ---
+general configuration:
+	mazeconfig.tcl
+game over sounds:
+	mazegame.tcl:
+		set sounds(game_over) {...}
+
+--- contact ---
+Ben Fuhrmannek <ben@fuhrmannek.de>
+SIP:7310@fuhrmannek.de
+IAX2:fuhrmannek.de/7310
+
