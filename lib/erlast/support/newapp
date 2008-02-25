@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo mkdir $1
+echo mkdir $1/src
+echo mkdir $1/doc
+echo mkdir $1/ebin
+SUPPORT= `dirname $0`
+
+echo "echo "VSN=0.1" > $1/vsn.mk"
+echo "echo "include ../../support/subdir.mk"  $1/Makefile"

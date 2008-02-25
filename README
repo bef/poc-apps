@@ -17,6 +17,13 @@ Directory:
 |- time
 |	a simple time announcement
 |
+|- lib
+|	reusable library code
+|
+|- lib/erlast
+|	patched version of the erlang asterisk interface library by Anders Nygren
+|	original: http://tools.assembla.com/svn/erlast/trunk
+|
 
 Contact:
 |

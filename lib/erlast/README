@@ -1,0 +1,24 @@
+ErlAst, Erlang Asterisk Software
+================================
+
+Building
+========
+
+> make
+
+Documentation
+
+> make docs
+
+After that there is some docmentation in lib/{ami,fast_agi}/doc
+
+Running
+========
+
+Start Erlang
+> erl -pa lib/fast_agi/ebin -pa $PATH_TO_AGI_SCRIPTS 
+
+At the erlang prompt give, Note the period at the end of the line
+application:start(fast_agi).
+
+That will start the server listening on port 4573.

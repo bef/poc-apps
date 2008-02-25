@@ -1,0 +1,75 @@
+
+	Fast_agi overview page
+
+@author Anders Nygren <anders.nygren@gmail.com>
+@copyright 2006 Anders Nygren
+@version {@vsn}
+@title Welcome to Fast_agi
+
+@doc Fast_agi is a fast_agi server for the software PBX <a href="http://asterisk.org">Asterisk</a> written in Erlang.
+
+<h3>Introduction</h3>
+<p>The Asterisk Gateway Interface, AGI, is an interface for calling
+external programs for handling the call processing logic in Asterisk.
+Normally an AGI call is done by forking a new process on the same
+machine to execute the AGI script.</p>
+
+<p>The advantage of this method is that the AGI script 
+<ul>
+  <li>can be written in any language, e.g perl, python et.c.</li>
+</ul>
+the disadvantages are that
+<ul>
+  <li>forking a new process for each AGI call is expensive</li>
+  <li>the AGI scripts must be executed on the same machine as Asterisk is running on.</li>
+</ul></p>
+
+<p>Fast_agi avoids the costly fork operation by using a socket based interface between the Asterisk server and the fast_agi server.
+The advantages with this aproach are
+<ul>
+  <li>faster</li>
+  <li>possible to run the fast_agi server on a separate host, to offload complex call handling from the traffic handling server</li>
+  <li>possible to use one fast_agi server for several Asterisk servers</li>
+</ul>
+</p>
+
+<h3>Usage</h3>
+<h4>Asterisk callplan, exten.conf</h4>
+<p>Fast_agi is used in the Asterisk call-plan by the AGI application.
+<pre>
+  exten => 123,1 Agi(agi://Host:Port/Path)
+</pre>
+Where 
+<ul>
+  <li>Host is the Hostname or IP address of the fast_agi server</li>
+  <li>Port is the port the fast_agi server is listening on</li>
+  <li>The interpretation of path is not defined by Asterisk but is open to the fast_agi server to interpret as it wishes.</li>
+</ul>
+
+<h4>Erlang agi script</h4>
+In the erlang fast_agi server the Path has to be given in the format Module/Function. This function must be of arity 2.
+
+<pre>
+  exten => 123,1 Agi(agi://Host:Port/myMod/myFun)
+
+will lead to a call to the erlang function
+
+  myMod:myFun(Params,Connection)
+</pre>
+
+<ul>
+  <li>Params = Variables passed by Asterisk, accessed by fast_agi:get_var(Var,Params)</li>
+  <li>Connection = #connection record, see include/fast_agi.hrl</li>
+</ul>
+</p>
+When calling a fast_agi script Asterisk sends the values of all variables defined in the call context, plus some fast_agi specific variables.
+
+<p>The erlang fast_agi script can control the call processing in Asterisk by calling the functions in <a href="fast_agi.html">fast_agi</a>.
+</p>
+
+<h4>Tracing</h4>
+It is possible to trace the communication between Asterisk and the fast_agi
+script, by calling the function
+<pre> fast_agi:trace(true) </pre>
+The tracing can be disabled again by
+<pre> fast_agi:trace(false) </pre>

@@ -1,0 +1,8 @@
+{application,fast_agi,
+        [{description, "Asterisk FastAGI Server"},
+         {vsn,"%VSN%"},
+         {modules,[%MODULES%]},
+	 {registered,[]},
+	 {applications,[kernel,stdlib]},
+         {mod,{fast_agi_app,[]}},
+	 {env,[]}]}.
