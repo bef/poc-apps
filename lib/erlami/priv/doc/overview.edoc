@@ -1,0 +1,21 @@
+@author: BeF <bef [-AT-] eventphone.de>
+@copyright 2008 - BeF
+@version 20080401
+@title erlami
+@doc This package implements the client side of the <a href="http://asterisk.org/">asterisk</a> manager interface API (AMI).
+
+<p>There are three modules incorporating different levels of abstraction:
+<ul>
+<li><a href="erlami_drv.html">erlami_drv</a>: the low-level protocol - message and event parsing/forwarding<br/>
+Each drv process corresponds directly to one AMI connection.</li>
+<li><a href="erlami_server.html">erlami_server</a>: synchronous and asynchronous message handling, event proxy<br/>
+One server may connect to several drivers.</li>
+<li><a href="erlami.html">erlami</a>: a client implementation for the typical case: one-to-one client-server<br/>
+This module also provides convenience functions for PDU assembly.</li>
+</ul>
+</p>
+
+<p>Links:<ul>
+<li><a href="http://poc-apps.sf.net">poc-apps</a></li>
+</ul>
+</p>

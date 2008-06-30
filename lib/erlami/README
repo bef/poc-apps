@@ -1,0 +1,25 @@
+Asterisk Manager Interface for Erlang
+
+about:
+	high-level AMI implementation
+
+author:
+	Ben Fuhrmannek <bef@eventphone.de>
+
+license:
+	GPLv3 - http://www.gnu.org/licenses/gpl.txt
+
+special thanks:
+	this code was inspired by Anders Nygren's erlast
+	(see http://tools.assembla.com/svn/erlast/trunk/)
+
+----------------------
+compile:
+	make
+
+documentation:
+	make doc
+
+examples:
+	./test
+

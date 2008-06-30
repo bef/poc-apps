@@ -1,0 +1,4 @@
+{'src/erlami_drv.erl', [{outdir, "ebin"}]}.
+{'src/erlami_server.erl', [{outdir, "ebin"}]}.
+{'src/erlami.erl', [{outdir, "ebin"}]}.
+
