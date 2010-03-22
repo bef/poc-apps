@@ -1,0 +1,47 @@
+== About ==
+In order to control the Blinkenlights Chaos Control Center (blccc) the usual
+ISDN setup looks like this.
+          +-----------+                         +-------+
+ ISDN---> | blinkisdn | ---BlinkenISDNProto---> | blccc |
+          +-----------+                         +-------+
+
+BlinkenAGI (this project) provides a way to substitute the ISDN dialin with
+an asterisk/FastAGI setup, such as this one:
+
+ +----------+                +----------+                         +-------+
+ | Asterisk | ---FastAGI---> | blinkagi | ---BlinkenISDNProto---> | blccc |
+ +----------+                +----------+                         +-------+
+
+
+== Files ==
+* blccc-emu.tcl -- blinken isdn protocol client / substitute for the real blccc
+* blinkagi.tcl -- FastAGI/blisdn bridge / this is the main program
+* blisdn.tcl -- blinken isdn protocol library
+* fastagi.tcl -- Asterisk FastAGI protocol client library
+* fastagitest.tcl -- example for fastagi.tcl
+* protokoll.txt -- ExtendedBlinkenIsdnProtocol protocol specification
+
+== Requirements ==
+* Tcl 8.5 or greater
+* tcludp 1.0.8: http://tcludp.sourceforge.net/
+
+== Usage Examples ==
+* Asterisk Dialplan (AEL example):
+	99 => {
+		Set(AGISIGHUP=no);
+		AGI(agi://localhost:1324);
+	};
+
+* blinkagi.tcl example - listen on 127.0.0.1:1324 (tcp) for AGI and 0.0.0.0:1234 (udp) for blink:
+	./blinkagi.tcl -i 4 -aa 127.0.0.1 -ap 1324 -bp 1234
+	see "blinkagi.tcl -?" for more information
+
+== References ==
+* ExtendedBlinkenIsdnProtocol - http://wiki.blinkenarea.org/index.php/ExtendedBlinkenIsdnProtocol
+* Blinkenlights Chaos Control Center (blccc) and related software - http://stefan.blinkenarea.org/blinkenlights/
+
+== License ==
+This software including its fastagi and blisdn libraries is released under the GNU General Public License, version 2.
+
+== Author/Contact ==
+Ben Fuhrmannek <bef@eventphone.de>

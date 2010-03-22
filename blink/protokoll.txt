@@ -1,0 +1,68 @@
+= ExtendedBlinkenIsdnProtocol =
+
+* Example (register/heartbeat):
+Client listening on UDP 12345   |   Server listening on UDP 1234
+             0:register:12345  --->  
+                               <---  0:heartbeat
+                  0:heartbeat  --->
+
+* Example (call):
+     Client          |   Server
+                   <---  1:setup:0815:2020
+       1:accepted  --->
+                   <---  1:connected
+  1:play:foo.alaw  --->
+                   <---  1:dtmf:#
+      1:hangup:16  --->
+                   <--- 1:onhook
+
+
+= Reference Documentation =
+URL: http://wiki.blinkenarea.org/index.php/ExtendedBlinkenIsdnProtocol
+
+BlinkenArea.ExtendedBlinkenIsdnProtocol
+144 pixels ought to be enough for anybody
+
+
+zurück zur Übersicht
+
+Das extended Blinkenisdn Protokoll wird benutzt, um den Status und die gedrückten Tasten von ISDN-Leitungen über ein Netzwerk zu übertragen. Dies geschieht durch das senden von UDP-Paketen, die jeweils eine Zeile Klartext enthalten. UDP wurde gewählt, um die Antwortzeiten so klein wie möglich zu halten.
+
+Um die benötigte bidirektionale Kommunikation zu erreichen, muss der ISDN-Server die IP und den Port des Clients kennen und der Cleint muss die IP und den Port des ISDN-Servers kennen.
+
+Der Server und der Client senden periodisch (z.B. alle 20s) Herzschlag-Nachrichten, um zu zeigen, dass die noch laufen. Ein Timeout tritt auf, wenn kein Herzschlag für eine längere Zeit (z.B. 60s) empfangen wurde. In diesem Fall legt der Server die ISN-Leitungen auf, bis sich ein neuer Client durch das senden von Herzschlag-Nachricthen verbindet (oder der gleiche Client sich neu verbindet). Der Client reagiert bei einem Timeout so, als ob alle Anrufer aufgelegt hätten.
+
+Die in UDP-Paketen versendeten Nachrichten, sind als ASCII-String kodiert und mit Doppelpunkten in zwei, drei oder vier Felder unterteilt, zum Beispiel:
+
+0:heartbeat
+1:dtmf:#
+1:setup:foobar:1234567890
+Das erste Feld gibt die Nummer der ISDN-Leitung als Dezimalzahl an oder ist 0 bei Nachrichten, die sich nicht auf eine ISDN-Leitung beziehen, wie Herzschlag-Nachrichten. Der Typ der Nachricht steht im zweiten Feld. Das dritte und vierte Feld hängen vom Typ der Nachricht ab.
+
+Nachrichten vom Sever zum Client:
+
+0:heartbeat
+periodisch (z.B. alle 20s) gesendet, um dem Client zu zeigen, dass der Server noch läuft
+<line-no>:setup:<caller-id>:<phone-no>
+gesendet, wenn eine Verbindung von <caller-id> an die Telefonnummer <phone-no> auf der ISDN-Leitung <line-no> eingeht
+<line-no>:connected
+gesendet, wenn die Verbindung auf der ISDN-Leitung <line-no> aufgebaut ist
+<line-no>:dtmf:<key>
+gesendet, wenn die Taste <key> auf ISDN-Leitung <line-no> gedrückt wurde
+<key> kann 0, ..., 9, *, # sein
+<line-no>:onhook
+gesendet, wenn die Verbindung auf der ISDN-Leitung <line-no> geschlossen wird (Anrufer oder Server legt auf)
+Nachrichten vom Client zum Server:
+
+0:heartbeat
+periodisch (z.B. alle 20s) gesendet, um dem Server zu zeigen, dass der Client noch läuft
+<line-no>:accept
+gesendet, wenn der Client einen eingehenden Anruf auf Leitung <line-no> annehmen will
+<line-no>:hangup:18
+gesendet, wenn der Client den Server bittet, die ISDN-Leitung <line-no> aufzulegen
+Es ist zur Zeit unbekannt, wofür die 18 gut ist...
+<line-no>:play:<filename>
+oder
+<line-no>:playbackground:<filename>
+angegebene Datei über die Telefonleitung abspielen
+--StefanSchuermans 31 Oct 2006
