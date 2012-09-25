@@ -5,29 +5,44 @@
  |_|   \___/ \____|   /_/   \_\ .__/| .__/|___/
                               |_|   |_|
 
-Directory:
+Asterisk related code
+- licensed GPLv2 or GPLv3 - see source code for details
 |
-|- maze
+|- maze/
 |	a virtual maze with dtmf navigation and web visualization
 |	languages: en, de
 |
-|- menschenrechte
+|- menschenrechte/
 |	human rights - articles 1-30 - spoken in german
 |
-|- time
+|- time/
 |	a simple time announcement
 |
-|- lib
+|- lib/
 |	reusable library code
 |
 |- lib/erlast
 |	patched version of the erlang asterisk interface library by Anders Nygren
 |	original: http://tools.assembla.com/svn/erlast/trunk
 |
+|- blink/
+|
+|
+
+
+Yate related code
+- licensed BSD - see source code for details
+|
+|- yate/ygi
+|	Tcl message handler library for Yate extmodule scripting
+|
+|- yate/*.tcl
+|	various examples
+|
+
 
 Contact:
 |
 | Ben Fuhrmannek <bef@eventphone.de>
-|-	SIP/7310@fuhrmannek.de
-|-	IAX2/fuhrmannek.de/7310
+|-	sip:2004@hg.eventphone.de
 |
