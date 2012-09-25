@@ -36,7 +36,9 @@ if {[llength $::argv] > 0} {
 ## asterisk < 1.2
 #agi::exec SetLanguage $language
 ## asterisk >= 1.2
-agi::exec Set "LANGUAGE()=$language"
+#agi::exec Set "LANGUAGE()=$language"
+## asterisk >= 1.6.x
+agi::exec Set CHANNEL(language)=$language
 
 ###############################################################################
 array set sounds {}
