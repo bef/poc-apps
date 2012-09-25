@@ -13,16 +13,18 @@ namespace eval ::blisdn {
 namespace import ::log::log
 
 ## check for missing heartbeats (ms)
-variable monitor_interval
-set monitor_interval 5000
+variable monitor_interval 5000
 
 ## remove peers not seen for some time (s)
-variable monitor_timeout
-set monitor_timeout 60
+variable monitor_timeout 60
 
 ## periodically send heartbeat to all peers (ms)
-variable heartbeat_interval
-set heartbeat_interval 20000
+variable heartbeat_interval 20000
+
+## status interval - send onhook/offhook for each line for each peer (ms)
+variable status_interval 1000
+## function name to acquire status list "line status ...", e.g. {0 onhook 1 offhook}
+variable status_cmd ""
 
 variable callback
 variable registry
@@ -82,6 +84,9 @@ proc start_server {port} {
 	variable callback
 	set callback(heartbeat) ::blisdn::handle_heartbeat
 	set callback(register) ::blisdn::handle_register
+
+	## start line status broadcast
+	start_status_broadcast
 }
 
 proc remove_peer {peer} {
@@ -121,6 +126,24 @@ proc heartbeat {peer} {
 	send_cmd $peer $registry($peer,port) {0 heartbeat}
 	start_heartbeat $peer
 }
+
+proc start_status_broadcast {} {
+	variable status_interval
+	after $status_interval [list ::blisdn::status_broadcast]
+}
+
+proc status_broadcast {} {
+	variable status_cmd
+	if {$status_cmd != ""} {
+		set status [$status_cmd]
+		log debug "status broadcast $status"
+		foreach {line status} $status {
+			broadcast_cmd "${line}:${status}"
+		}
+	}
+	start_status_broadcast
+}
+
 
 ## default handlers
 

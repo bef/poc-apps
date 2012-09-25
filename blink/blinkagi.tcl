@@ -33,7 +33,7 @@ if {[catch parseopts err]} {
 package require log
 namespace import ::log::log
 log::lvSuppressLE critical 0
-# log::lvSuppressLE debug 1
+#log::lvSuppressLE debug 1
 
 log info "init."
 
@@ -59,7 +59,7 @@ proc next_free_ichannel {} {
 	global ichannel
 	global maxichannels
 	for {set x 1} {$x <= $maxichannels} {incr x} {
-		if {$ichannel($x) == "free"} { return $x }
+		if {$ichannel($x) eq "free"} { return $x }
 	}
 	return
 }
@@ -114,7 +114,7 @@ set ::fastagi::callback(closed) chan_closed
 proc handle_accept {peer ichan} {
 	global ichannel
 	log debug "handle_accept $peer $ichan $ichannel($ichan)"
-	if {$ichannel($ichan) == "free"} {return}
+	if {$ichannel($ichan) eq "free"} {return}
 	
 	set ichannel($ichan,blisdnpeer) $peer
 	set ichannel($ichan,loopaction) "wait"
@@ -128,7 +128,7 @@ proc handle_accept {peer ichan} {
 proc handle_hangup {peer ichan cause} {
 	global ichannel
 	log debug "got hangup from $peer line $ichan cause $cause"
-	if {$ichannel($ichan) == "free"} {return}
+	if {$ichannel($ichan) eq "free"} {return}
 	## graceful hangup, but undefined agi disconnect
 	# ::fastagi::send_cmd $ichannel($ichan) "hangup"
 	## dirty hangup, but fast and functional
@@ -152,10 +152,26 @@ proc handle_playbackground {peer ichan filename} {
 	handle_play $peer $ichan $filename
 }
 
+proc get_ichannel_status {} {
+	global ichannel
+	global maxichannels
+	set statuslist {}
+	for {set i 1} {$i <= $maxichannels} {incr i} {
+		lappend statuslist $i
+		if {$ichannel($i) eq "free"} {
+			lappend statuslist onhook
+		} else {
+			lappend statuslist offhook
+		}
+	}
+	return $statuslist
+}
+
 set ::blisdn::callback(accept) handle_accept
 set ::blisdn::callback(hangup) handle_hangup
 set ::blisdn::callback(play) handle_play
 set ::blisdn::callback(playbackground) handle_playbackground
+set ::blisdn::status_cmd get_ichannel_status
 ::blisdn::start_server $params(bp)
 
 
@@ -172,7 +188,7 @@ proc fwd_dtmf {asciivalue ichan} {
 proc digitloop {ichan} {
 	global ichannel
 	while true {
-		if {$ichannel($ichan) == "free"} { return }
+		if {$ichannel($ichan) eq "free"} { return }
 		
 		switch $ichannel($ichan,loopaction) {
 			wait {

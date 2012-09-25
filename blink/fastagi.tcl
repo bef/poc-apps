@@ -107,6 +107,11 @@ proc new_line {chan} {
 	## update timestamp
 	variable channel
 	set channel($chan) [clock seconds]
+
+	## hangup?
+	if {$block($chan) eq "HANGUP"} {
+		close_chan $chan
+	}
 }
 
 
@@ -164,7 +169,7 @@ proc channel_monitor {chan} {
 	## active channel?
 	if {[expr "$channel($chan) + 10"] > [clock seconds]} { return }
 
-	## channel status (auto-hangup for dead channels
+	## channel status (auto-hangup for dead channels)
 	set status [send_cmd $chan {channel status}]
 	if {$status == "error"} {
 	# 	close_chan $chan

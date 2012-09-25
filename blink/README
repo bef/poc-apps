@@ -28,7 +28,7 @@ an asterisk/FastAGI setup, such as this one:
 == Usage Examples ==
 * Asterisk Dialplan (AEL example):
 	99 => {
-		Set(AGISIGHUP=no);
+		//Set(AGISIGHUP=no);
 		AGI(agi://localhost:1324);
 	};
 
