@@ -402,7 +402,7 @@ proc ::ygi::message {name {retvalue ""} {kv {}}} {
 	_write message $id $time $name $retvalue {*}[_join_kv $kv]
 	vwait "::ygi::$id"
 	unset "::ygi::$id"
-	return $::ygi::lastresult(retvalue)
+	return $::ygi::lastresult(processed)
 }
 
 ## shortcut for ::ygi::message
@@ -634,5 +634,38 @@ proc ::ygi::heartbeat {} {
 
 proc ::ygi::quit {} {
 	_raw_write "%%>quit"
+}
+
+## ask for password
+## return <success>
+## example: ask_password password 1234 exit_on_failure true
+proc ::ygi::ask_password {args} {
+	set default_args {
+		password 0000
+		retries 3
+		enter_pw_sound "enter-password"
+		invalid_sound "beeperr"
+		getdigits_args {10}
+		exit_on_failure false
+		exit_sound "goodbye"}
+	array set cnf [dict merge $default_args $args]
+	set loggedin false
+	for {set i 0} {$i < $cnf(retries)} {incr i} {
+		play $cnf(enter_pw_sound)
+		set input [getdigits {*}$cnf(getdigits_args)]
+		if {[join $input ""] eq $cnf(password)} {
+			set loggedin true
+			break
+		}
+		if {[info exists ::ygi::env(caller)]} {
+			log "INVALID PASSWORD FROM CALLER ${::ygi::env(caller)}"
+		}
+		play_wait $cnf(invalid_sound)
+	}
+	if {!$loggedin && $exit_on_failure} {
+		play_wait $cnf(exit_sound)
+		_exit 1
+	}
+	return $loggedin
 }
 
