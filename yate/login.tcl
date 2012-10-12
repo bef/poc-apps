@@ -12,6 +12,11 @@
 # example regexroute.conf entry:
 # ^81$=external/nodata/login.tcl
 #
+# NOTE: This example can be simplified significantly using the ::ygi::ask_password function:
+# if {[info exists ::ygi::env(password)]} {
+# 	::ygi::ask_password password $::ygi::env(password) exit_on_failure true
+# }
+
 
 ## CONFIGURATION
 ## manually set custom soundpath and soundformats here instead of yate.conf section [ygi]

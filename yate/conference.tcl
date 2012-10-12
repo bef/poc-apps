@@ -28,7 +28,7 @@ package require ygi
 #::ygi::play_wait "beep"
 ::ygi::sleep 500
 
-## password? (exit if pw provided but entered incorrectly)
+## password? (exit if pw set but entered incorrectly)
 if {[info exists ::ygi::env(password)]} {
 	::ygi::ask_password password $::ygi::env(password) exit_on_failure true
 }
