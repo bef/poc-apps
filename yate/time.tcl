@@ -39,14 +39,15 @@ for {set i 0} {$i < 3} {incr i} {
 		lappend out "digits/20" "digits/[expr {$h - 20}]"
 	}
 
-	if {$m == "00"} {
+	if {$m eq "00"} {
 		lappend out "digits/oclock"
-	} elseif {$m < 10} {
-		lappend out "letters/o" "digits/[expr {$m + 0}]"
+	} elseif {[string index 0 $m] eq "0"} {
+		lappend out "letters/o" "digits/[string index 1 $m]"
 	} elseif {$m <= 20} {
 		lappend out "digits/$m"
 	} else {
-		lappend out "digits/[expr {$m/10*10}]" "digits/[expr {$m % 10}]"
+		lappend out "digits/[expr {$m/10*10}]"
+		if {[expr {$m % 10}]} { lappend out "digits/[expr {$m % 10}]" }
 	}
 
 	foreach f $out {
