@@ -325,6 +325,15 @@ proc ::ygi::_find_soundfile {fn} {
 	return $fn
 }
 
+## helper function to create variables from 'args' with predefined default values
+proc dict_args {default_args} {
+	upvar 1 args args
+	set args [dict merge $default_args $args]
+	foreach k [dict keys $default_args] {
+		uplevel 1 [list set $k [dict get $args $k]]
+	}
+}
+
 ##
 ## PUBLIC API
 ##
@@ -588,7 +597,12 @@ proc ::ygi::getdigit {{usebuffer true} {timeout 0}} {
 ## <digittimeout> - stop collecting digits after inactivity in ms - 0 to disable
 ## <silence> - play silence after first entered digit
 ## <enddigit> - stop after getting this digit
-proc ::ygi::getdigits {{maxdigits 10} {digittimeout 6000} {silence true} {enddigit "#"}} {
+proc ::ygi::getdigits {args} {
+	dict_args {	maxdigits 10
+			digittimeout 6000
+			silence true
+			enddigit "#"}
+
 	set digits {}
 	for {set i 0} {$i < $maxdigits} {incr i} {
 		set digit [getdigit true $digittimeout]
@@ -640,30 +654,29 @@ proc ::ygi::quit {} {
 ## return <success>
 ## example: ask_password password 1234 exit_on_failure true
 proc ::ygi::ask_password {args} {
-	set default_args {
-		password 0000
-		retries 3
-		enter_pw_sound "enter-password"
-		invalid_sound "beeperr"
-		getdigits_args {10}
-		exit_on_failure false
-		exit_sound "goodbye"}
-	array set cnf [dict merge $default_args $args]
+	dict_args {	password 0000
+			retries 3
+			enter_pw_sound "enter-password"
+			invalid_sound "ybeeperr"
+			getdigits_args {}
+			exit_on_failure false
+			exit_sound "goodbye"}
+
 	set loggedin false
-	for {set i 0} {$i < $cnf(retries)} {incr i} {
-		play $cnf(enter_pw_sound)
-		set input [getdigits {*}$cnf(getdigits_args)]
-		if {[join $input ""] eq $cnf(password)} {
+	for {set i 0} {$i < $retries} {incr i} {
+		play $enter_pw_sound
+		set input [getdigits {*}$getdigits_args]
+		if {[join $input ""] eq $password} {
 			set loggedin true
 			break
 		}
 		if {[info exists ::ygi::env(caller)]} {
 			log "INVALID PASSWORD FROM CALLER ${::ygi::env(caller)}"
 		}
-		play_wait $cnf(invalid_sound)
+		play_wait $invalid_sound
 	}
 	if {!$loggedin && $exit_on_failure} {
-		play_wait $cnf(exit_sound)
+		play_wait $exit_sound
 		_exit 1
 	}
 	return $loggedin

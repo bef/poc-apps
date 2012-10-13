@@ -21,28 +21,31 @@ package require ygi
 ## start message handler 
 ::ygi::start_ivr
 
-## play beep and wait for the audio to come through properly
-::ygi::play_wait "beep"
+## play intro sound and wait for the audio to come through properly
+::ygi::play_wait "yintro"
 ::ygi::sleep 500
 
 ## say current time a few times, then hangup
 for {set i 0} {$i < 3} {incr i} {
-	::ygi::play_wait "time"
 
 	set time [clock format [clock seconds] -format "%k:%M"]
 	foreach {h m} [split $time ":"] {}
+	set h [string trim $h]
+	set m [string trimleft $h "0"]
 
-	set out {}
+	set out {time silence/200u}
+
 	if {$h <= 20} {
 		lappend out "digits/$h"
 	} else {
 		lappend out "digits/20" "digits/[expr {$h - 20}]"
 	}
+	lappend out silence/150u
 
-	if {$m eq "00"} {
+	if {$m == 0} {
 		lappend out "digits/oclock"
-	} elseif {[string index 0 $m] eq "0"} {
-		lappend out "letters/o" "digits/[string index 1 $m]"
+	} elseif {$m < 10} {
+		lappend out "letters/o" "digits/$m"
 	} elseif {$m <= 20} {
 		lappend out "digits/$m"
 	} else {

@@ -51,7 +51,7 @@ if {!$success} {
 	::ygi::play_wait conference
 	::ygi::play_wait is-curntly-unavail
 } else {
-	::ygi::play_wait beep
+	::ygi::play_wait yintro
 }
 ::ygi::sleep 1000
 exit 0

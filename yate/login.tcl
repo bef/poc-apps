@@ -34,8 +34,8 @@ package require ygi
 #::ygi::print_env
 #set ::ygi::debug true
 
-## play beep and wait for the audio to come through properly
-::ygi::play_wait "beep"
+## play intro sound and wait for the audio to come through properly
+::ygi::play_wait "yintro"
 ::ygi::sleep 500
 
 ## LOGIN
@@ -44,13 +44,13 @@ set secret "1234"
 set loggedin false
 for {set i 0} {$i < 3} {incr i} {
 	::ygi::play "enter-password"
-	set input [::ygi::getdigits 10]
+	set input [::ygi::getdigits maxdigits 10]
 	if {[join $input ""] eq $secret} {
 		set loggedin true
 		break
 	}
 	::ygi::log "INVALID PASSWORD FROM CALLER ${::ygi::env(caller)}"
-	::ygi::play_wait "beeperr"
+	::ygi::play_wait "ybeeperr"
 }
 if {!$loggedin} {
 	::ygi::play_wait "goodbye"
