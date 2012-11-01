@@ -417,7 +417,7 @@ proc ::ygi::message {name {retvalue ""} {kv {}}} {
 ## shortcut for ::ygi::message
 ## e.g. 'message foo.test "" {a b c d}' --> 'msg foo.test a b c d'
 proc ::ygi::msg {name args} {
-	message $name "" $args
+	return [message $name "" $args]
 }
 
 ## install message handler

@@ -29,6 +29,7 @@ if {$::argc > 0} {
 	## all parameters are contained in the first element of $::argv
 	## (also: assume argv element 0 to be a Tcl list)
 	set ::argv [lindex $::argv 0]
+	set ::argc [llength $::argv]
 	::ygi::log "ARGV: [join $::argv ", "]"
 }
 

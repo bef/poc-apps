@@ -31,7 +31,7 @@ for {set i 0} {$i < 3} {incr i} {
 	set time [clock format [clock seconds] -format "%k:%M"]
 	foreach {h m} [split $time ":"] {}
 	set h [string trim $h]
-	set m [string trimleft $h "0"]
+	set m [string trimleft $m "0"]
 
 	set out {time silence/200u}
 

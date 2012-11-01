@@ -22,7 +22,7 @@ function createsnd() {
 	checkfn $1 || return
 	echo "[+] $1: $2"
 	## mac
-	say -v Serena -o $1.tmp.wav --file-format=WAVE --data-format=LEI16 --channels=1 "$2"
+	say -v Daniel -o $1.tmp.wav --file-format=WAVE --data-format=LEI16 --channels=1 "$2"
 	sox $1.tmp.wav $1.wav trim 0 -0:00.22
 	rm $1.tmp.wav
 	sox $1.wav -t raw -r 8000 -c 1 -e signed-integer $1.slin
