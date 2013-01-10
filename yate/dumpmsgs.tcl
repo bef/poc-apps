@@ -18,7 +18,7 @@
 # 
 
 ## YGI setup
-set auto_path [linsert $auto_path 0 [file dirname $::argv0]]
+set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 package require ygi
 
 ## watch handler function
