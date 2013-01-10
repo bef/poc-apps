@@ -25,8 +25,8 @@ package require ygi
 #set ::ygi::debug true
 
 ## beep or wait
-#::ygi::play_wait "beep"
-::ygi::sleep 500
+::ygi::play_wait "yintro"
+#::ygi::sleep 500
 
 ## password? (exit if pw set but entered incorrectly)
 if {[info exists ::ygi::env(password)]} {
@@ -42,17 +42,18 @@ foreach p $confparams {
 	}
 }
 #::ygi::log $params
-set success [::ygi::msg call.conference {*}$params]
+#set success [::ygi::msg call.conference {*}$params]
+set success [::ygi::msg chan.masquerade id $::ygi::env(id) message call.execute callto $::ygi::env(room) {*}params]
 
 #::ygi::log $::ygi::lastresult(kv)
 #::ygi::log $success
 
 if {!$success} {
-	::ygi::play_wait conference
-	::ygi::play_wait is-curntly-unavail
-} else {
-	::ygi::play_wait yintro
+	::ygi::play_wait im-sorry
+	::ygi::play_wait conference-unavailable
+	::ygi::play_wait please-try-again-later
 }
-::ygi::sleep 1000
+
+::ygi::sleep 500
 exit 0
 

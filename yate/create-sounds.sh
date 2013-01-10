@@ -76,4 +76,8 @@ createsnd goodbye goodbye
 createsnd t-magic "there is no such thing as magic"
 createsnd time time
 createsnd welcome welcome
+createsnd utc utc
+createsnd im-sorry "i am sorry"
+createsnd conference-unavailable "this conference is currently unavailable"
+createsnd please-try-again-later "please try again later"
 
