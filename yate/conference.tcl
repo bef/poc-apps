@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh8.5
 #
-# Yate Script: login example
+# Yate Script: conference with optional password protection
 #
 # Author: Ben Fuhrmannek <bef@eventphone.de>
 # Date: 2012-09-21
@@ -33,20 +33,14 @@ if {[info exists ::ygi::env(password)]} {
 	::ygi::ask_password password $::ygi::env(password) exit_on_failure true
 }
 
+::ygi::play_wait "yintro"
+
 ## initiate conference call
 set confparams {existing smart echo voice counted billing utility player maxusers lonely record notify recordwarn rate room}
-set params {}
-foreach p $confparams {
-	if {[info exists ::ygi::env($p)]} {
-		lappend params $p $::ygi::env($p)
-	}
-}
-#::ygi::log $params
-#set success [::ygi::msg call.conference {*}$params]
+set params [::ygi::filter_env $confparams]
 set success [::ygi::msg chan.masquerade id $::ygi::env(id) message call.execute callto $::ygi::env(room) {*}params]
 
-#::ygi::log $::ygi::lastresult(kv)
-#::ygi::log $success
+## INFO: script should be terminated here automatically on success.
 
 if {!$success} {
 	::ygi::play_wait im-sorry

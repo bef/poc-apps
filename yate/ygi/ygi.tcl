@@ -651,10 +651,11 @@ proc ::ygi::quit {} {
 }
 
 ## ask for password
-## return <success>
+## return <input> or false
 ## example: ask_password password 1234 exit_on_failure true
 proc ::ygi::ask_password {args} {
 	dict_args {	password 0000
+			passwords {}
 			retries 3
 			enter_pw_sound "enter-password"
 			invalid_sound "ybeeperr"
@@ -666,12 +667,22 @@ proc ::ygi::ask_password {args} {
 	for {set i 0} {$i < $retries} {incr i} {
 		play $enter_pw_sound
 		set input [getdigits {*}$getdigits_args]
-		if {[join $input ""] eq $password} {
+		set input [join $input ""]
+
+		## check password
+		if {[llength $passwords] > 0} {
+			## allow multiple $passwords
+			if {[lsearch -exact $passwords $input] != -1} {
+				set loggedin true
+				break
+			}
+		} elseif {$input eq $password} {
 			set loggedin true
 			break
 		}
+
 		if {[info exists ::ygi::env(caller)]} {
-			log "INVALID PASSWORD FROM CALLER ${::ygi::env(caller)}"
+			log "${::ygi::env(called)}: INVALID PASSWORD FROM CALLER ${::ygi::env(caller)}"
 		}
 		play_wait $invalid_sound
 	}
@@ -679,6 +690,20 @@ proc ::ygi::ask_password {args} {
 		play_wait $exit_sound
 		_exit 1
 	}
+	if {$loggedin} {
+		return $input
+	}
 	return $loggedin
+}
+
+## return ::ygi::env dict with given keys only
+proc ::ygi::filter_env {args} {
+	set params {}
+	foreach p $args {
+		if {[info exists ::ygi::env($p)]} {
+			lappend params $p $::ygi::env($p)
+		}
+	}
+	return $params
 }
 
