@@ -81,7 +81,7 @@ if {![dict exists $params room]} {
 }
 
 # initiate conference call
-set success [::ygi::msg chan.masquerade id $::ygi::env(id) message call.execute callto [dict get $params room] {*}params]
+set success [::ygi::msg chan.masquerade id $::ygi::env(id) message call.execute callto [dict get $params room] {*}$params]
 
 ## INFO: script should be terminated here automatically on success.
 
