@@ -38,7 +38,7 @@ if {[info exists ::ygi::env(password)]} {
 ## initiate conference call
 set confparams {existing smart echo voice counted billing utility player maxusers lonely record notify recordwarn rate room}
 set params [::ygi::filter_env $confparams]
-set success [::ygi::msg chan.masquerade id $::ygi::env(id) message call.execute callto $::ygi::env(room) {*}params]
+set success [::ygi::msg chan.masquerade id $::ygi::env(id) message call.execute callto $::ygi::env(room) {*}$params]
 
 ## INFO: script should be terminated here automatically on success.
 
