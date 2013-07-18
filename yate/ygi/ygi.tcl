@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+package require Tcl 8.5
 package provide ygi 0.1
 
 
@@ -112,7 +112,7 @@ proc ::ygi::_input {} {
 			} elseif {$result eq "true"} {
 				_raw_write "%%<message:$id:true:$name:$retvalue:$kv"
 			} else {
-				foreach {processed name retvalue kv} $result {}
+				lassign $result processed name retvalue kv
 				if {$processed == 1 || $processed eq "true"} {
 					set processed "true"
 				} else {
