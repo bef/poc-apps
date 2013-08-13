@@ -623,7 +623,7 @@ proc ::ygi::getdigits {args} {
 ## terminate script after <timeout> s
 proc ::ygi::script_timeout {{timeout 1200}} {
 	after [expr {$timeout * 1000}] {
-		_exit 1 "NOTICE: script timeout."
+		::ygi::_exit 1 "NOTICE: script timeout."
 	}
 }
 
@@ -634,7 +634,7 @@ proc ::ygi::idle_timeout {{timeout 600} {interval 60}} {
 		heartbeat
 	} else {
 		if {$::ygi::idlesince + $timeout < [clock seconds]} {
-			_exit 1 "NOTICE: idle timeout after $timeout seconds."
+			::ygi::_exit 1 "NOTICE: idle timeout after $timeout seconds."
 		}
 	}
 	after [expr {$interval * 1000}] ::ygi::idle_timeout $timeout $interval
