@@ -32,6 +32,21 @@
 package require Tcl 8.5
 package provide ygi 0.1
 
+## define Tcl8.6 function lmap
+if {[info command lmap] eq ""} {
+	proc lmap {varlist list body} {
+		set i 0
+		set varlist2 {}
+		foreach var $varlist {
+			upvar 1 $var var[incr i]
+			lappend varlist2 var$i
+		}
+		set res {}
+		foreach $varlist2 $list {lappend res [uplevel 1 $body]}
+		set res
+	}
+}
+
 
 ##
 ## ::ygi NAMESPACE
@@ -218,11 +233,7 @@ proc ::ygi::_split_kv {kv} {
 
 ## convert {a b c d ...} --> {a=b c=d ...}
 proc ::ygi::_join_kv {kv} {
-	set out {}
-	foreach {k v} $kv {
-		lappend out "$k=$v"
-	}
-	return $out
+	return [lmap {k v} $kv {set _ "$k=$v"}]
 }
 
 proc ::ygi::_raw_write {s} {
@@ -237,64 +248,63 @@ proc ::ygi::_write {keyword args} {
 	_raw_write [join $out ":"]
 }
 
+
+## from the extmodule documentation (where it also says 'Please do not use it as reference'):
+## Any value that contains special characters (ASCII code lower than 32) MUST have them converted to %<upcode> where <upcode> is the character with a numeric value equal with 64 + original ASCII code. The % character itself MUST be converted to a special %% representation. Characters with codes higher than 32 (except %) SHOULD not be escaped but may be so. A %-escaped code may be received instead of an unescaped character anywhere except in the initial keyword or the delimiting colon (:) characters. Anywhere in the line except the initial keyword a % character not followed by a character with a numeric value higher than 64 (40H, 0x40, '@') or another % is an error.
+##
+## in other words:
+## ord(c) < 32 or c == ":" --> encode as %<c+64>
+## c == "%" -> encode as %%
+## otherwise -> encode as c
 proc ::ygi::yencode {s} {
-	set ret {}
+	set ret ""
 	foreach c [split $s {}] {
 		set ord [scan "$c" "%c"]
 		if {$ord < 32 || $c eq ":"} {
-			lappend ret [format "%%%c" [expr {$ord + 64}]]
+			append ret [format "%%%c" [expr {$ord + 64}]]
 		} elseif {$c eq "%"} {
-			lappend ret "%%"
+			append ret "%%"
 		} else {
-			lappend ret $c
+			append ret $c
 		}
 	}
-	return [join $ret ""]
+	return $ret
 }
 
+##
+## %% -> decode as %
+## %c where ord(c) >= 64 -> decode as <c-64>
+## c (without %) -> decode as c
 proc ::ygi::ydecode {s} {
-	set ret {}
-	set len [string length $s]
-	for {set i 0} {$i < $len} {incr i} {
-		set c [string index $s $i]
-		if {$c ne "%"} {
-			lappend ret $c
-			continue
+	set ret ""
+	set percent 0
+	foreach c [split $s ""] {
+		if {$percent} {
+			set percent 0
+			set ord [scan "$c" "%c"]
+			if {$ord >= 64} {
+				append ret [format "%c" [expr {$ord - 64}]]
+			} elseif {$c eq "%"} {
+				append ret "%"
+			}
+		} else {
+			if {$c eq "%"} {set percent 1; continue}
+			append ret $c
 		}
-		incr i
-		if {$i == $len} {
-			## last character is "%"? -> ignore
-			continue
-		}
-		set c [string index $s $i]
-		set ord [scan "$c" "%c"]
-		if {$ord < 64} {
-			## invalid character -> ignore
-			continue
-		}
-		lappend ret [format "%c" [expr {$ord - 64}]]
-
-
 	}
-	return [join $ret ""]
+	return $ret
 }
+
 
 proc ::ygi::yencodelist {l} {
-	set out {}
-	foreach element $l {
-		lappend out [yencode $element]
-	}
-	return $out
+	return [lmap element $l {yencode $element}]
 }
 proc ::ygi::ydecodelist {l} {
-	set out {}
-	foreach element $l {
-		lappend out [ydecode $element]
-	}
-	return $out
+	return [lmap element $l {ydecode $element}]
 }
 
 proc ::ygi::uniqueid {} {
+	## [uuid::uuid generate] is insanely slow :(
 	variable uniqueid_counter
 	return "ygi.[pid].[incr uniqueid_counter]"
 }
@@ -326,7 +336,7 @@ proc ::ygi::_find_soundfile {fn} {
 }
 
 ## helper function to create variables from 'args' with predefined default values
-proc dict_args {default_args} {
+proc ::ygi::dict_args {default_args} {
 	upvar 1 args args
 	set args [dict merge $default_args $args]
 	foreach k [dict keys $default_args] {
