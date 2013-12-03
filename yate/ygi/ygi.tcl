@@ -375,8 +375,8 @@ proc ::ygi::start {{fdin stdin} {fdout stdout}} {
 }
 
 ## shortcut for TCP start
-proc ::ygi::start_tcp {ip port} {
-	set fd [socket 127.0.0.1 5039]
+proc ::ygi::start_tcp {{ip 127.0.0.1} {port 5039}} {
+	set fd [socket $ip $port]
 	start $fd $fd
 	return $fd
 }
