@@ -45,7 +45,7 @@ set loggedin false
 for {set i 0} {$i < 3} {incr i} {
 	::ygi::play "enter-password"
 	set input [::ygi::getdigits maxdigits 10]
-	if {[join $input ""] eq $secret} {
+	if {$input eq $secret} {
 		set loggedin true
 		break
 	}

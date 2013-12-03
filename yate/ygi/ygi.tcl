@@ -589,8 +589,8 @@ proc ::ygi::getdigit {{usebuffer true} {timeout 0}} {
 			set dtmfbuffer [lreplace $dtmfbuffer 0 0]
 			return $digit
 		}
-	} else {
 	}
+	
 	if {$timeout > 0} {
 		set afterid [after $timeout {set ::ygi::lastdigit ""}]
 	}
@@ -613,19 +613,14 @@ proc ::ygi::getdigits {args} {
 			silence true
 			enddigit "#"}
 
-	set digits {}
+	set digits ""
 	for {set i 0} {$i < $maxdigits} {incr i} {
 		set digit [getdigit true $digittimeout]
-		if {$digit eq ""} {
-			return $digits
-		}
-		if {$i == 0 && $silence} {
-			silence
-		}
-		if {$digit eq $enddigit} {
-			return $digits
-		}
-		lappend digits $digit
+		if {$digit eq ""} {break}
+		if {$i == 0 && $silence} {silence}
+		if {$digit eq $enddigit} {break}
+		
+		append digits $digit
 	}
 	return $digits
 }
@@ -677,7 +672,6 @@ proc ::ygi::ask_password {args} {
 	for {set i 0} {$i < $retries} {incr i} {
 		play $enter_pw_sound
 		set input [getdigits {*}$getdigits_args]
-		set input [join $input ""]
 
 		## check password
 		if {[llength $passwords] > 0} {
