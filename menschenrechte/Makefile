@@ -20,7 +20,7 @@ install-yate:
 	-[ -d yate ] && cp -r ./yate/* $(YATE_SCRIPTS)/
 	-[ -d sounds ] && cp -r ./sounds/* $(YATE_SOUNDS)/
 
-install-yate-link:
+install-yate-symlink:
 	ln -s `pwd`/yate/mr.tcl $(YATE_SCRIPTS)/
 	ln -s `pwd`/sounds/mr $(YATE_SOUNDS)/
 	
