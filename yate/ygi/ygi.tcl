@@ -568,6 +568,17 @@ proc ::ygi::play_wait {fn args} {
 	waitfornotify
 }
 
+## assume notification on DTMF input.
+## this will cause play_wait to stop waiting with any user input
+proc ::ygi::set_dtmf_notify {{onoff 1}} {
+	set trigger {apply {{_n1 _n2 _op} {set ::ygi::_notify 1}}}
+	if {$onoff} {
+		trace add variable ::ygi::dtmfbuffer write $trigger
+	} else {
+		trace remove variable ::ygi::dtmfbuffer write $trigger
+	}
+}
+
 ## play silence
 proc ::ygi::silence {} {
 	msg chan.attach source tone/silence
