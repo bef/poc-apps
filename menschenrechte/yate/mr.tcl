@@ -32,7 +32,7 @@ while true {
 	set nr [::ygi::getdigits digittimeout 3000 silence true maxdigits 2]
 	set nr [string trimleft $nr 0]
 
-	if {![string is integer $nr]} {
+	if {$nr eq "" || ![string is integer $nr]} {
 		set nr [expr {int(rand() * ($cfg(mr_end) - $cfg(mr_start) + 1) + $cfg(mr_start))}]
 	} elseif {$nr < $cfg(mr_start) || $nr > $cfg(mr_end)} {
 		::ygi::play ybeeperr
