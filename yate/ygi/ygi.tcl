@@ -184,7 +184,7 @@ proc ::ygi::_input {} {
 }
 
 proc ::ygi::_exit {{code 0} {message ""} {logfn log}} {
-	if {[catch {eval $::ygi::onexit} err]} {
+	if {[catch {uplevel #0 $::ygi::onexit} err]} {
 		$logfn "ERROR in onexit script: $err"
 	}
 	if {$message ne ""} {
@@ -218,6 +218,11 @@ proc ::ygi::_dtmf_handler {id time name retvalue kv} {
 	set lastdigit $digit
 	heartbeat
 	return true
+}
+
+## default hangup handler
+proc ::ygi::_hangup_handler {id time name retvalue kv} {
+	_exit 0 "" forcelog
 }
 
 ## convert {a=b c=d ...} --> {a b c d ...}
@@ -391,6 +396,7 @@ proc ::ygi::start_ivr {} {
 	vwait ::ygi::env
 	install "chan.notify" ::ygi::_notify_handler 100 targetid $::ygi::env(id)
 	install "chan.dtmf" ::ygi::_dtmf_handler 100 id $::ygi::env(id)
+	install "chan.hangup" ::ygi::_hangup_handler 100 id $::ygi::env(id)
 }
 
 ## enter event loop
@@ -542,6 +548,7 @@ proc ::ygi::print_env {} {
 ## wait for chan.notify, e.g. for EOF on wave/play
 proc ::ygi::waitfornotify {} {
 	vwait ::ygi::_notify
+	return $::ygi::_notify
 }
 
 ## play <fn>
@@ -563,15 +570,58 @@ proc ::ygi::play {fn args} {
 ## play <fn> and wait
 ## <args> are parameters to chan.attach, e.g. autorepeat true
 ## note: requires default chan.notify handler
+## note: the function will return on dtmf input if set_dtmf_notify is on
 proc ::ygi::play_wait {fn args} {
 	play $fn notify $::ygi::env(id) {*}$args
 	waitfornotify
 }
 
+## play one or more files and get dtmf digit input
+## <filelist> - play files in order
+## <file> - play file. if both <file> and <filelist> are given, <file> is played last
+## <play_args> - additional arguments for ::ygi::play
+## <stopdigits> - stop after receiving these digits, e.g. {1 2 3}
+## <clear_dtmfbuffer> - clear the buffer before playback. defaults to true
+## NOTE: this function won't stop with dtmf input unless set_dtmf_notify is on
+proc ::ygi::play_getdigit {args} {
+	dict_args {
+		filelist {}
+		file {}
+		play_args {}
+		stopdigits {any}
+		clear_dtmfbuffer true
+	}
+	if {$file ne ""} {lappend filelist $file}
+
+	if {$clear_dtmfbuffer} {::ygi::clear_dtmfbuffer}
+
+	foreach fn $filelist {
+		::ygi::play_wait $fn {*}$play_args
+		while {$::ygi::_notify eq "dtmf"} {
+			if {[llength $::ygi::dtmfbuffer] > 0} {
+				set digit [getdigit]
+				if {$stopdigits eq "any" || [lsearch -exact $stopdigits $digit] >= 0} {
+					silence
+					return $digit
+				}
+			}
+			::ygi::clear_dtmfbuffer
+			::ygi::waitfornotify
+		}
+	}
+	return
+}
+
+## play <fn> and discard any dtmf input
+## <args> - additional arguments for ::ygi::play
+proc ::ygi::play_force {fn args} {
+	play_getdigit file $fn stopdigits {} play_args $args
+}
+
 ## assume notification on DTMF input.
-## this will cause play_wait to stop waiting with any user input
+## this will cause waitfornotify to stop waiting
 proc ::ygi::set_dtmf_notify {{onoff 1}} {
-	set trigger {apply {{_n1 _n2 _op} {set ::ygi::_notify 1}}}
+	set trigger {apply {{_n1 _n2 _op} {set ::ygi::_notify dtmf}}}
 	if {$onoff} {
 		trace add variable ::ygi::dtmfbuffer write $trigger
 	} else {
