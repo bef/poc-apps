@@ -1,5 +1,20 @@
 #!/bin/sh
-sox $1 -t raw -r 8000 -c 1 -e signed-integer $2
 
-## usage e.g. for asterisk sound directory:
-## for i in `find . -type f`; do wav2slin $i `dirname $i`/`basename $i .wav`.slin; done
+wav2slin()
+{
+	sox "$1" -t raw -r 8000 -c 1 -e signed-integer "$2"
+}
+
+case "$1" in
+	-d)
+		for i in `find $2 -type f -name \*.wav`; do
+			out="`dirname $i`/`basename $i .wav`.slin"
+			if [ ! -f $out ]; then
+				wav2slin $i $out
+			fi
+		done
+		;;
+	*)
+		wav2slin "$1" "$2"
+		;;
+esac
