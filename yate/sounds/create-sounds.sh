@@ -22,7 +22,7 @@ function createsnd() {
 	checkfn $1 || return
 	echo "[+] $1: $2"
 	## mac
-	say -v Daniel -o $1.tmp.wav --file-format=WAVE --data-format=LEI16 --channels=1 "$2"
+	say -v $VOICE -o $1.tmp.wav --file-format=WAVE --data-format=LEI16 --channels=1 "$2"
 	sox $1.tmp.wav $1.wav trim 0 -0:00.22
 	rm $1.tmp.wav
 	sox $1.wav -t raw -r 8000 -c 1 -e signed-integer $1.slin
@@ -41,8 +41,12 @@ if [ ! -w . ]; then
 	exit 1
 fi
 
+###########################################################
+## English
+VOICE=Daniel
+
 ## digits
-for i in {0..20} 30 40 50 60 70 80 90 hundred thousand million minus oclock hash asterisk; do
+for i in {0..23} 30 40 50 60 70 80 90 and hundred thousand million minus oclock hash asterisk; do
 	createsnd digits/$i $i
 done
 
@@ -82,3 +86,35 @@ createsnd conference-unavailable "this conference is currently unavailable"
 createsnd please-try-again-later "please try again later"
 createsnd please-enter-your-access-code "please enter your access code, followed by the pound key"
 createsnd press-snom-reboot "please press star star hash hash"
+
+
+###########################################################
+## Deutsch
+VOICE=Anna
+
+## digits
+for i in {0..23} 30 40 50 60 70 80 90 und hundert tausend million millionen minus uhr; do
+	createsnd de/digits/$i $i
+done
+createsnd de/digits/hash raute
+createsnd de/digits/asterisk stern
+
+## German phonetic alphabet
+for i in anton berta caesar dora emil friedrich gustav heinrich ieda julius kaufmann ludwig martha nordpol otto paula quelle richard siegfried theodor ulrich viktor wilhelm xanthippe ypsilon zeppelin; do
+	createsnd de/phonetic/${i:0:1} $i
+done
+
+## letters
+for i in {a..z} dollar; do
+	createsnd de/letters/$i $i
+done
+createsnd de/letters/dash Bindestrich
+createsnd de/letters/percent Prozent
+createsnd de/letters/slash Schraegstrich
+createsnd de/letters/equals Istgleich
+createsnd de/letters/comma Komma
+createsnd de/letters/fullstop Punkt
+
+## words and phrases
+#createsnd de/foo foo
+

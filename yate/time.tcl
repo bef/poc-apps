@@ -35,7 +35,7 @@ for {set i 0} {$i < 3} {incr i} {
 
 	set out {time silence/200u}
 
-	if {$h <= 20} {
+	if {$h <= 23} {
 		lappend out "digits/$h"
 	} else {
 		lappend out "digits/20" "digits/[expr {$h - 20}]"

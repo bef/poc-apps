@@ -640,9 +640,9 @@ proc ::ygi::clear_dtmfbuffer {} {
 }
 
 ## get dtmf digit
-## <usebuffer> - use buffered digits if available
 ## <timeout> - return "" after timeout in ms - 0 for no timeout
-proc ::ygi::getdigit {{usebuffer true} {timeout 0}} {
+## <usebuffer> - use buffered digits if available
+proc ::ygi::getdigit {{timeout 0} {usebuffer true}} {
 	variable dtmfbuffer
 	if {$usebuffer} {
 		if {[llength $dtmfbuffer] > 0} {
@@ -676,7 +676,7 @@ proc ::ygi::getdigits {args} {
 
 	set digits ""
 	for {set i 0} {$i < $maxdigits} {incr i} {
-		set digit [getdigit true $digittimeout]
+		set digit [getdigit $digittimeout]
 		if {$digit eq ""} {break}
 		if {$i == 0 && $silence} {silence}
 		if {$digit eq $enddigit} {break}
@@ -770,5 +770,101 @@ proc ::ygi::filter_env {args} {
 		}
 	}
 	return $params
+}
+
+## return ::ygi::env($key) or default
+proc ::ygi::getenv {key {default ""}} {
+	if {[info exists ::ygi::env($key]} {
+		return $::ygi::env($key)
+	}
+	return $default
+}
+
+##
+
+proc ::ygi::_en_numberfiles {number} {
+	if {$number < 0} {return}
+	if {$number <= 23} {return [list $number]}
+	if {[_find_soundfile "digits/$number"] ne "digits/$number"} {return [list $number]}
+	if {$number < 100} {
+		set rem [expr {$number % 10}]
+		set files [list [expr {$number - $rem}]]
+		if {$rem} {lappend files $rem}
+		return $files
+	}
+	if {$number < 1000} {
+		return [list [expr {$number / 100}] hundred and {*}[_en_numberfiles [expr {$number % 100}]]]
+	}
+	if {$number < 1000000} {
+		return [list {*}[_en_numberfiles [expr {$number / 1000}]] thousand {*}[_en_numberfiles [expr {$number % 1000}]]]
+	}
+	return [split $number ""]
+}
+
+proc ::ygi::_de_numberfiles {number} {
+	if {$number < 0} {return}
+	if {$number <= 23} {return [list $number]}
+	if {[_find_soundfile "de/digits/$number"] ne "de/digits/$number"} {return [list $number]}
+	if {$number < 100} {
+		set rem [expr {$number % 10}]
+		set tens [expr {$number - $rem}]
+		if {$rem} {return [list $rem und $tens]}
+		return [list $tens]
+	}
+	if {$number < 1000} {
+		return [list [expr {$number / 100}] hundert {*}[_de_numberfiles [expr {$number % 100}]]]
+	}
+	if {$number < 1000000} {
+		return [list {*}[_de_numberfiles [expr {$number / 1000}]] tausend {*}[_de_numberfiles [expr {$number % 1000}]]]
+	}
+	return [split $number ""]
+}
+
+## say number
+proc ::ygi::say_number {number {language en}} {
+	set number [string trim $number]
+	set number [string trimleft $number "0"]
+	if {$number eq "" || ![string is integer $number]} {
+		play_force ybeeperr
+		return
+	}
+
+	switch $language {
+		de {
+			set files [_de_numberfiles $number]
+			set files [lmap f $files {set _ "de/digits/$f"}]
+		}
+		en -
+		default {
+			set files [_en_numberfiles $number]
+			set files [lmap f $files {set _ "digits/$f"}]
+		}
+	}
+	if {[llength $files]} {
+		play_getdigit filelist $files stopdigits {}
+	}
+}
+
+## say each digit
+proc ::ygi::say_digits {digits {language en}} {
+	set digits [string trim $digits]
+
+	set prefix ""
+	if {$language ne "en"} {set prefix "$language/"}
+	
+	foreach d [join [split $digits ""] " sleep "] {
+		switch -regexp -- $d {
+			sleep {sleep 250; continue}
+			{\d} {play_force "${prefix}digits/${d}"}
+			{[a-zA-Z]} {play_force "${prefix}phonetic/[string tolower $d]"}
+			{,} {play_force "${prefix}letters/comma"}
+			{-} {play_force "${prefix}letters/dash"}
+			{\$} {play_force "${prefix}letters/dollar"}
+			{=} {play_force "${prefix}letters/equals"}
+			{\.} {play_force "${prefix}letters/fullstop"}
+			{%} {play_force "${prefix}letters/percent"}
+			{/} {play_force "${prefix}letters/slash"}
+		}
+	}
 }
 
