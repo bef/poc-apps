@@ -204,7 +204,9 @@ proc ::ygi::_ivr_call_execute_handler {id time name retvalue kv} {
 
 ## default notify handler
 proc ::ygi::_notify_handler {id time name retvalue kv} {
-	set ::ygi::_notify 1
+	set reason 1
+	if {[dict exists $kv reason]} {set reason [dict get $kv reason]}
+	set ::ygi::_notify $reason
 	return true
 }
 
@@ -596,8 +598,8 @@ proc ::ygi::play_getdigit {args} {
 	if {$clear_dtmfbuffer} {::ygi::clear_dtmfbuffer}
 
 	foreach fn $filelist {
-		::ygi::play_wait $fn {*}$play_args
-		while {$::ygi::_notify eq "dtmf"} {
+		play_wait $fn {*}$play_args
+		while {$::ygi::_notify ne "eof"} {
 			if {[llength $::ygi::dtmfbuffer] > 0} {
 				set digit [getdigit]
 				if {$stopdigits eq "any" || [lsearch -exact $stopdigits $digit] >= 0} {
@@ -605,8 +607,8 @@ proc ::ygi::play_getdigit {args} {
 					return $digit
 				}
 			}
-			::ygi::clear_dtmfbuffer
-			::ygi::waitfornotify
+			clear_dtmfbuffer
+			waitfornotify
 		}
 	}
 	return
@@ -774,7 +776,7 @@ proc ::ygi::filter_env {args} {
 
 ## return ::ygi::env($key) or default
 proc ::ygi::getenv {key {default ""}} {
-	if {[info exists ::ygi::env($key]} {
+	if {[info exists ::ygi::env($key)]} {
 		return $::ygi::env($key)
 	}
 	return $default
@@ -823,7 +825,7 @@ proc ::ygi::_de_numberfiles {number} {
 ## say number
 proc ::ygi::say_number {number {language en}} {
 	set number [string trim $number]
-	set number [string trimleft $number "0"]
+	if {$number ne "0"} {set number [string trimleft $number "0"]}
 	if {$number eq "" || ![string is integer $number]} {
 		play_force ybeeperr
 		return
