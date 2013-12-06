@@ -1,25 +1,18 @@
-#!/usr/bin/tclsh
-##
-## maze game
-##	(c) BeF <bef@erlangen.ccc.de>
-##
+#!/usr/bin/env tclsh8.6
+#
+# Interactive Maze Game for Yate
+#
+# Author: Ben Fuhrmannek <bef@eventphone.de>
+# Date: 2013-12-06
+#
+# Copyright (c) 2013, Ben Fuhrmannek
+# All rights reserved.
+# 
 
-###############################################################################
-
-
-
-package require festtcl
-package require agi
-
-agi::init
-agi::answer
-
-
-##
-if {[catch {
-##
-
-###############################################################################
+set auto_path [linsert $auto_path 0 [file join [file dirname [file normalize [info script]]] .. .. yate]]
+set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] ..]]
+set auto_path [linsert $auto_path 0 [file join [file dirname [info script]]]]
+package require ygi
 
 source [file join [file dirname $::argv0] mazeconfig.tcl]
 source [file join [file dirname $::argv0] mazegen.tcl]
@@ -28,24 +21,20 @@ if {$use_highscore} {
 	source [file join [file dirname $::argv0] mazesql.tcl]
 }
 
-## accept language code as first parameter: de/en
-if {[llength $::argv] > 0} {
-	set language [lindex $::argv 0]
-}
-
-## asterisk < 1.2
-#agi::exec SetLanguage $language
-## asterisk >= 1.2
-#agi::exec Set "LANGUAGE()=$language"
-## asterisk >= 1.6.x
-agi::exec Set CHANNEL(language)=$language
-
-###############################################################################
-source [file join [file dirname $::argv0] mazesound.tcl]
+::ygi::idle_timeout 180 20
+::ygi::script_timeout 3600
+::ygi::start_ivr
+::ygi::set_dtmf_notify
+#set ::ygi::debug true
 
 ###############################################################################
 ## init vars
-set cid $agi::env(agi_callerid)
+set language [::ygi::getenv language de]
+set verbose [::ygi::getenv verbose 0]
+
+# caller id
+set cid [::ygi::getenv caller 0]
+
 set running 1
 set input ""
 set outfiles {}
@@ -54,48 +43,45 @@ array set pos {x 0 y 0 z 0 dir EAST}
 set DIRS {NORTH EAST SOUTH WEST}
 set starttime 0
 set endtime 0
+# 
+# ## no cid error
+# if {$cid == ""} {
+# 	agi::verbose "no cid" 4
+# 	agi::hangup
+# }
 
-## no cid error
-if {$cid == ""} {
-	agi::verbose "no cid" 4
-	agi::hangup
-}
+###############################################################################
+source [file join [file dirname $::argv0] mazesound.tcl]
 
 ###############################################################################
 ## functions ##
 
 ## stream soundfile(s) until * is pressed
 proc stream {soundfile_list} {
-	foreach f $soundfile_list {
-		set digit [agi::streamfile $f "*"]
-		if {$digit == "*"} { break }
-	}
+	::ygi::play_getdigit filelist $soundfile_list stopdigits {*}
 }
 
-## stream soundfile(s) until $digits digits are pressed
-proc get_data {soundfile_list wait digits} {
-	set first [lrange $soundfile_list 0 [expr {[llength $soundfile_list]-2}]]
-	set last [lindex $soundfile_list end]
-	set input ""
-	set firstwait $wait
-	if {$digits == 1} { set firstwait 1000 }
-	foreach f $first {
-		set input [agi::getdata $f $firstwait $digits]
-		if {$input != ""} { break }
+## stream soundfile(s) and wait for user input
+proc get_data {soundfile_list {wait 10000} {maxdigits 1}} {
+	set digits [::ygi::play_getdigit filelist $soundfile_list]
+	if {$digits ne ""} {incr maxdigits -1}
+	
+	if {$maxdigits} {
+		append digits [::ygi::getdigits maxdigits $maxdigits digittimeout $wait]
 	}
-	if {$input == ""} {
-		set input [agi::getdata $last $wait $digits]
-	}
-	return $input
+	
+	return $digits
 }
 
 ## return a random element from the list l
 proc random_choice {l} {
-	expr {srand([clock clicks])}
 	return [lindex $l [expr {int(rand()*[llength $l])}]]
 }
 
-
+proc log {msg} {
+	if {!$::verbose} {return}
+	::ygi::log $msg
+}
 ###############################################################################
 
 ## intro
@@ -103,11 +89,18 @@ stream [random_choice $sounds(intro)]
 
 ## game loop
 while { 1 } {
+	## generate maze
 	gen_maze $level $cid
-	foreach line [show_level 0] { agi::verbose "$cid $line" 3 }
+	
+	## make rand() unpredictable
+	expr {srand([clock clicks])}
+
+	## print maze on console (parameter 0 means z-level 0. no 3D logfile yet.)
+	::ygi::log "CID $cid, LEVEL $level"
+	foreach line [show_level 0] { log "$cid $line" }
 	
 	stream [random_choice $sounds(level_intro)]
-	agi::saynumber $level
+	::ygi::say_number $level $language
 	
 	set running 1
 	set pos(x) 0
@@ -125,10 +118,10 @@ while { 1 } {
 
 		set input ""
 		if {$outfiles != {}} {
-			set input [get_data $outfiles 10000 1]
+			set input [get_data $outfiles]
 		}
 		set outfiles {}
-		agi::verbose "CID $cid, LEVEL $level POS $pos(x)x$pos(y)x$pos(z)" 4
+		log "CID $cid, LEVEL $level POS $pos(x)x$pos(y)x$pos(z)"
 		switch $input {
 			4 {
 				## turn left
@@ -173,8 +166,8 @@ while { 1 } {
 			}
 			0 {
 				## enter level code / change level
-				set inlevel [agi::getdata [random_choice $sounds(enter_level_nr)] 10000 2]
-				set incode [agi::getdata [random_choice $sounds(enter_level_code)] 10000 4]
+				set inlevel [get_data [random_choice $sounds(enter_level_nr)] 10000 2]
+				set incode [get_data [random_choice $sounds(enter_level_code)] 10000 4]
 				regsub {^0} $inlevel {} inlevel
 				regsub -all {[^\d]} $inlevel {} inlevel
 				if {![string is integer "$inlevel"]} { set inlevel 0 }
@@ -190,9 +183,9 @@ while { 1 } {
 				## announce level code
 				set snd [random_choice $sounds(level_code)]
 				stream [lindex $snd 0]
-				agi::saynumber $level
+				::ygi::say_number $level $language
 				stream [lindex $snd 1]
-				agi::saydigits [code $level $cid]
+				::ygi::say_digits [code $level $cid] $language
 			}
 			1 {
 				## help
@@ -243,7 +236,7 @@ while { 1 } {
 					::mazedb::add_to_highscore $cid $level $starttime $endtime
 					::mazedb::disconnect_db
 				} eid]} {
-					agi::verbose "db error: $eid" 3
+					::ygi::log "db error: $eid"
 				}
 			}
 
@@ -253,9 +246,9 @@ while { 1 } {
 			## announce level code
 			set snd [random_choice $sounds(level_code)]
 			stream [lindex $snd 0]
-			agi::saynumber $level
+			::ygi::say_number $level $language
 			stream [lindex $snd 1]
-			agi::saydigits [code $level $cid]
+			::ygi::say_digits [code $level $cid] $language
 
 		}
 	}
@@ -264,14 +257,8 @@ while { 1 } {
 		## winner
 		set level $::maxlevel
 		stream [random_choice $sounds(game_over)]
-		agi::exec echo ""
+		::ygi::log "$cid wins at level $level."
 		break
 	}
 	
 }
-
-##
-} fid]} {
-	agi::verbose "error $fid" 4
-}
-##

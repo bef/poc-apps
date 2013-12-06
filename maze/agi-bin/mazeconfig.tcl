@@ -10,7 +10,7 @@ set maxlevel 50
 
 ################################################################################
 ## highscore -- this requires a properly set up mysql server
-set use_highscore 1
+set use_highscore 0
 set mysql_db {	host 127.0.0.1 \
 		port 3306 \
 		user maze \
