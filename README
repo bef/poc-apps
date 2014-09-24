@@ -5,39 +5,40 @@
  |_|   \___/ \____|   /_/   \_\ .__/| .__/|___/
                               |_|   |_|
 
-Asterisk related code
+
 - licensed GPLv2 or GPLv3 - see source code for details
 |
 |- maze/
-|	a virtual maze with dtmf navigation and web visualization
-|	languages: en, de
+|   a virtual maze with dtmf navigation and web visualization
+|   languages: en, de
+|   available for Asterisk and Yate
 |
 |- menschenrechte/
-|	human rights - articles 1-30 - spoken in german
+|   human rights - articles 1-30 - spoken in german
+|   available for Asterisk and Yate
 |
 |- time/
-|	a simple time announcement
+|   Asterisk AGI: a simple time announcement
 |
 |- lib/
-|	reusable library code
+|   reusable library code
 |
 |- lib/erlast
-|	patched version of the erlang asterisk interface library by Anders Nygren
-|	original: http://tools.assembla.com/svn/erlast/trunk
+|   patched version of the erlang asterisk interface library by Anders Nygren
+|   original: http://tools.assembla.com/svn/erlast/trunk
 |
 |- blink/
-|
+|   implementation of the Blinkenlights Chaos Control Center (blccc) protocol
+|   for Asterisk
 |
 
-
-Yate related code
-- licensed BSD - see source code for details
+- Library dependencies
 |
-|- yate/ygi
-|	Tcl message handler library for Yate extmodule scripting
+| for Asterisk:
+|   tcl agi 1.0 - http://tel.sf.net
 |
-|- yate/*.tcl
-|	various examples
+| for Yate:
+|   ygi - https://github.com/bef/yate/
 |
 
 
