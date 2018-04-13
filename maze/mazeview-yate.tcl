@@ -4,7 +4,6 @@
 set auto_path [linsert $auto_path 0 [file join [file dirname [file normalize [info script]]] .. .. yate]]
 set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] ..]]
 set auto_path [linsert $auto_path 0 [file join [file dirname [info script]]]]
-package require ygi
 
 source [file join [file dirname $::argv0] mazeconfig.tcl]
 source [file join [file dirname $::argv0] mazegen.tcl]
