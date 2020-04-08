@@ -17,7 +17,7 @@ package require ygi
 
 ## parameters -> variables
 array set cfg {sound_prefix "mr/" mr_start 1 mr_end 30}
-array set cfg [::ygi::filter_env [array names cfg]]
+array set cfg [::ygi::filter_env {*}[array names cfg]]
 
 ##
 
