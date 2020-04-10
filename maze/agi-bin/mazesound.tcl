@@ -1,6 +1,6 @@
 array set sounds {}
-switch $language {
-	en {
+switch -glob $language {
+	en* {
 		set sounds(intro) {
 			{yintro maze/en/init/welcome maze/en/init/begin maze/en/init/skip_help maze/en/init/help maze/en/init/fnord}
 			}
@@ -86,7 +86,7 @@ switch $language {
 			}
 
 	}
-	de -
+	de* -
 	default {
 		set sounds(intro) {
 			{beep maze/de/init/willkommen maze/de/init/skip_intro maze/de/init/help}
